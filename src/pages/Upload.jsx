@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FiUploadCloud, FiFile, FiX, FiCheck } from 'react-icons/fi';
 
@@ -15,8 +15,7 @@ export default function Upload() {
 
   const token = localStorage.getItem('token');
   if (!token) {
-    navigate('/login');
-    return null;
+    return <Navigate to="/login" replace />;
   }
 
   const handleFile = (f) => {
@@ -48,7 +47,7 @@ export default function Upload() {
       formData.append('chart', file);
       const res = await axios.post('/api/charts/upload', formData, {
         headers: {
-          Authorization: 'Bearer ' + token,
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
           'Content-Type': 'multipart/form-data'
         }
       });
