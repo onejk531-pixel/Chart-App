@@ -22,7 +22,9 @@ const storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: function (req, file, cb) {
+    const ALLOWED_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif']);
     const ext = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_EXTS.has(ext)) return cb(new Error('Invalid file extension'));
     const hash = crypto.randomBytes(16).toString('hex');
     cb(null, `${Date.now()}-${hash}${ext}`);
   }

@@ -66,9 +66,10 @@ app.get('/api/health', (req, res) => {
 // Serve frontend in production
 app.use(express.static(path.join(__dirname, 'dist')));
 app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ msg: 'API endpoint not found' });
   }
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // Global error handler — never leak stack traces
