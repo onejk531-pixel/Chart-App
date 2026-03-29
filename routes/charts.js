@@ -96,6 +96,7 @@ router.post('/upload', auth, (req, res, next) => {
 
     res.status(201).json(chart);
   } catch (err) {
+    if (req.file) fs.unlink(req.file.path, () => {});
     console.error('Upload error:', err.message);
     res.status(500).json({ msg: 'Upload failed. Please try again.' });
   }
