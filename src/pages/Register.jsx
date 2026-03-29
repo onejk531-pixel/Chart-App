@@ -2,29 +2,36 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FiMail, FiLock } from 'react-icons/fi';
+import { FiMail, FiLock, FiUserPlus } from 'react-icons/fi';
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
+    if (!email || !password || !confirm) {
       toast.error('Please fill in all fields');
+      return;
+    }
+    if (password !== confirm) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters');
       return;
     }
     setLoading(true);
     try {
-      const res = await axios.post('/api/auth/login', { email, password });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      toast.success('Welcome back!');
-      navigate('/dashboard');
+      await axios.post('/api/auth/register', { email, password });
+      toast.success('Account created! Please sign in.');
+      navigate('/login');
     } catch (err) {
-      toast.error(err.response?.data?.msg || 'Login failed');
+      toast.error(err.response?.data?.msg || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -33,8 +40,8 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="card auth-card">
-        <h2 className="auth-title">Welcome Back</h2>
-        <p className="auth-subtitle">Sign in to access your charts and analysis</p>
+        <h2 className="auth-title">Create Account</h2>
+        <p className="auth-subtitle">Start analyzing your charts with AI</p>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label"><FiMail size={14} /> Email</label>
@@ -52,18 +59,29 @@ export default function Login() {
             <input
               type="password"
               className="form-input"
-              placeholder="Enter your password"
+              placeholder="Min 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
+              autoComplete="new-password"
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label"><FiLock size={14} /> Confirm Password</label>
+            <input
+              type="password"
+              className="form-input"
+              placeholder="Confirm your password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              autoComplete="new-password"
             />
           </div>
           <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>
-            {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : 'Sign In'}
+            {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><FiUserPlus size={16} /> Create Account</>}
           </button>
         </form>
         <p className="auth-footer">
-          Don&apos;t have an account? <Link to="/register">Create one</Link>
+          Already have an account? <Link to="/login">Sign in</Link>
         </p>
       </div>
     </div>
